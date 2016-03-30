@@ -1,0 +1,22 @@
+{
+  "name": "gmaps-school-ui",
+  "version": "0.0.1",
+  "description": "Google Maps Schools",
+  "private": true,
+  "scripts": {
+    "start": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:lfantone/gmaps-school-ui.git"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-cli": "^1.1.1",
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-webserver": "0.9.1"
+  },
+  "dependencies": {
+    "lodash": "^4.1.0"
+  }
+}

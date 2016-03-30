@@ -1,0 +1,12 @@
+{
+  "path": {
+    "DEST": "app/"
+  },
+  "webserver": {
+    "directoryListing": false,
+    "fallback": "index.html",
+    "livereload": true,
+    "open": "http://localhost:9001/",
+    "port": 9001
+  }
+}
