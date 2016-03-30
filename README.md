@@ -1,2 +1,1 @@
-# gmaps-school-ui
-Google Maps implementation for school
+# Google Maps for Buenos Aires schools
