@@ -35,7 +35,7 @@ GoogleMapsService.prototype.addMarker = function(data, timeout) {
     var options = {
       animation: google.maps.Animation.DROP,
       map: self.map,
-      position: {lat: data.geo.lng, lng: data.geo.lat},
+      position: data.geo,
       title: data.establishment
     };
 
@@ -84,17 +84,16 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   var left = document.createElement('div');
   var right = document.createElement('div');
   var title = document.createElement('h3');
-  var items = [document.createElement('p'), document.createElement('p'), document.createElement('p')];
+  var item = document.createElement('p');
   var close = document.createElement('div');
   var button = document.createElement('button');
 
   left.appendChild(title);
-  for (var i = 0; i < items.length; i++) {
-    // items[i].innerText =
-    items[i].style.margin = 0;
+  item.innerText = 'Presupuesto: $ ' + data.amount;
+  item.style.margin = 0;
+  item.style.fontSize = '12px';
 
-    left.appendChild(items[i]);
-  }
+  left.appendChild(item);
   infoWindow.appendChild(left);
 
   right.appendChild(close);
