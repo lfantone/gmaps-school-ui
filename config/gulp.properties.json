@@ -1,6 +1,8 @@
 {
   "path": {
-    "DEST": "app/"
+    "bundle": "app/bundle",
+    "dest": "app/",
+    "entries": "app/scripts/app.js"
   },
   "webserver": {
     "directoryListing": false,
