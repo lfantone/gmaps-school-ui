@@ -87,6 +87,7 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   var item = document.createElement('p');
   var close = document.createElement('div');
   var button = document.createElement('button');
+  var self = this;
 
   left.appendChild(title);
   item.innerText = 'Presupuesto: $ ' + data.amount;
@@ -138,14 +139,20 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   button.style.boxShadow = 'inset 0 -1px 0 #009DDC';
   button.style.textAlign = 'center';
   button.innerText = 'Detalles';
-  button.addEventListener('click', _.bind(this.goToExternalLink, this));
+  button.addEventListener('click', function(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    self.goToExternalLink(data);
+  });
 
   wrapper.appendChild(infoWindow);
 
   this.infoWindow = true;
 };
 
-GoogleMapsService.prototype.removeInfoWindow = function () {
+GoogleMapsService.prototype.removeInfoWindow = function() {
   var infoWindow = document.getElementById('maps-info-window');
   var wrapper = document.querySelector('.map-container');
   wrapper.removeChild(infoWindow);
@@ -210,12 +217,8 @@ GoogleMapsService.prototype.hideInfoWindow = function(event) {
   }
 };
 
-GoogleMapsService.prototype.goToExternalLink = function(event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-  return '';
+GoogleMapsService.prototype.goToExternalLink = function(data) {
+  window.abrirLicitacion(data.licitation);
 };
 
 module.exports = new GoogleMapsService();
