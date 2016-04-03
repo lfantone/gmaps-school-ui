@@ -52,7 +52,7 @@ GoogleMapsService.prototype.addMarker = function(data, timeout) {
 
 GoogleMapsService.prototype.addMarkers = function(data) {
   for (var i = 0; i < data.length; i++) {
-    this.addMarker(data[i], i * 200);
+    this.addMarker(data[i], i * 50);
   }
 };
 
@@ -110,6 +110,7 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   infoWindow.style.left = '20px';
   infoWindow.style.bottom = '-100px';
   infoWindow.style.opacity = 0;
+  infoWindow.style.borderRadius = '5px';
 
   title.style.margin = 0;
   title.style.fontSize = '14px';
@@ -121,11 +122,13 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   right.style.width = '20%';
   right.style.float = 'right';
 
-  close.style.fontSize = 'small';
   close.style.float = 'right';
   close.style.cursor = 'pointer';
-  close.style.marginBottom = '5px';
-  close.innerText = 'close';
+  close.style.padding = '5px 0 0 0';
+  close.style.margin = '-15px 0 0 -25px';
+  close.style.cursor = 'pointer';
+  close.style.width = '5px';
+  close.innerText = 'x';
   close.addEventListener('click', _.bind(this.hideInfoWindow, this));
 
   button.style.borderRadius = '4px';

@@ -13,5 +13,5 @@ schoolService.getSchools()
     }
   })
   .catch(function(response) {
-    console.error(response, 'Oops :(');
+    console.error(response, 'Oops ! There was a connection error. Can\'t reach the API.');
   });
