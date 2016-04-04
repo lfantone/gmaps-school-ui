@@ -8,7 +8,7 @@ SchoolService.prototype.getSchools = function () {
 };
 
 SchoolService.prototype.getSchoolsFromJSON = function () {
-  return axios.get('/schools.json');
+  return axios.get(location.protocol + '//' + location.host + '/master/js/schools.json');
 };
 
 module.exports = new SchoolService();
