@@ -141,6 +141,7 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   button.style.color = '#FFF';
   button.style.boxShadow = 'inset 0 -1px 0 #009DDC';
   button.style.textAlign = 'center';
+  button.style.margin = '20px -15px 0 -15px';
   button.innerText = 'Detalles';
   button.addEventListener('click', function(event) {
     if (event) {
