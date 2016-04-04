@@ -1,5 +1,6 @@
 'use strict';
 var axios = require('axios');
+var response = require('./schools.json');
 
 var SchoolService = function() {};
 
@@ -8,7 +9,7 @@ SchoolService.prototype.getSchools = function () {
 };
 
 SchoolService.prototype.getSchoolsFromJSON = function () {
-  return axios.get(location.protocol + '//' + location.host + '/master/js/schools.json');
+  return response;
 };
 
 module.exports = new SchoolService();

@@ -16,9 +16,5 @@ schoolService.getSchools()
   .then(callback)
   .catch(function(response) {
     console.error(response, 'Oops ! There was a connection error. Can\'t reach the API.');
-    schoolService.getSchoolsFromJSON()
-      .then(callback)
-      .catch(function(response) {
-        console.error(response, 'Oops ! There was an error. Can\'t get the file.');
-      });
+    callback(schoolService.getSchoolsFromJSON());
   });
