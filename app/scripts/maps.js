@@ -5,8 +5,14 @@ var colors = {
   20: 'FE7569',
   30: 'FFFF57'
 };
-
 var GoogleMapsService = function() {};
+
+function createDocumentElement(element, innerText) {
+  var el = document.createElement(element);
+  el.innerText = innerText;
+
+  return el;
+}
 
 GoogleMapsService.prototype.initialize = function(opts) {
   var target = document.getElementById('map');
@@ -23,6 +29,15 @@ GoogleMapsService.prototype.initialize = function(opts) {
 
   _.merge(options, opts);
   this.map = new google.maps.Map(target, options);
+  this.map.data.loadGeoJson('/bundle/buenos-aires.json');
+  this.map.data.setStyle({
+    fillColor: 'red',
+    fillOpacity: 0.1,
+    strokeColor: 'red',
+    strokeOpacity: 1,
+    strokeWeight: 1,
+    zIndex: 1
+  });
   this.markers = [];
   return this;
 };
@@ -33,7 +48,6 @@ GoogleMapsService.prototype.addMarker = function(data, timeout) {
 
   window.setTimeout(function() {
     var options = {
-      animation: google.maps.Animation.DROP,
       map: self.map,
       position: data.geo,
       title: data.establishment
@@ -84,17 +98,35 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   var left = document.createElement('div');
   var right = document.createElement('div');
   var title = document.createElement('h3');
-  var item = document.createElement('p');
   var close = document.createElement('div');
   var button = document.createElement('button');
+  var items = [];
   var self = this;
 
   left.appendChild(title);
-  item.innerText = 'Presupuesto: $ ' + data.amount;
-  item.style.margin = 0;
-  item.style.fontSize = '12px';
 
-  left.appendChild(item);
+  if (data.licitation) {
+    items.push(createDocumentElement('p', data.licitation.code));
+  }
+
+  if (data.program) {
+    items.push(createDocumentElement('p', data.program.name));
+  }
+
+  if (data.amount.official) {
+    items.push(createDocumentElement('p', 'Presupuesto (oficial): $ ' + data.amount.official));
+  }
+
+  if (data.amount.hired) {
+    items.push(createDocumentElement('p', 'Presupuesto (contratado): $ ' + data.amount.hired));
+  }
+
+  for (var i = 0; i < items.length; i++) {
+    items[i].style.margin = 0;
+    items[i].style.fontSize = '10px';
+    left.appendChild(items[i]);
+  }
+
   infoWindow.appendChild(left);
 
   right.appendChild(close);
@@ -103,20 +135,20 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
 
   infoWindow.id = 'maps-info-window';
   infoWindow.style.margin = 'auto';
-  infoWindow.style.width = '80%'
+  infoWindow.style.width = '90%'
   infoWindow.style.backgroundColor = 'white';
   infoWindow.style.padding = '10px';
   infoWindow.style.position = 'absolute';
-  infoWindow.style.left = '20px';
+  infoWindow.style.left = '5px';
   infoWindow.style.bottom = '-100px';
   infoWindow.style.opacity = 0;
   infoWindow.style.borderRadius = '5px';
 
   title.style.margin = 0;
-  title.style.fontSize = '14px';
+  title.style.fontSize = '12px';
   title.innerText = data.establishment;
 
-  left.style.width = '80%';
+  left.style.width = '75%';
   left.style.float = 'left';
 
   right.style.width = '20%';
@@ -141,7 +173,7 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   button.style.color = '#FFF';
   button.style.boxShadow = 'inset 0 -1px 0 #009DDC';
   button.style.textAlign = 'center';
-  button.style.margin = '20px -15px 0 -15px';
+  button.style.margin = '10px -10px 0 -15px';
   button.innerText = 'Detalles';
   button.addEventListener('click', function(event) {
     if (event) {
@@ -156,11 +188,15 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   this.infoWindow = true;
 };
 
-GoogleMapsService.prototype.removeInfoWindow = function() {
+GoogleMapsService.prototype.removeInfoWindow = function(data, callback) {
   var infoWindow = document.getElementById('maps-info-window');
   var wrapper = document.querySelector('.map-container');
   wrapper.removeChild(infoWindow);
   delete this.infoWindow;
+
+  if (callback) {
+    callback(data);
+  }
 };
 
 GoogleMapsService.prototype.showInfoWindow = function(data) {
@@ -190,12 +226,16 @@ GoogleMapsService.prototype.showInfoWindow = function(data) {
    el = document.getElementById('maps-info-window');
   }
 
-  if (!this.isInfoOpen) {
+  if (this.isInfoOpen) {
+    this.hideInfoWindow(undefined, data, function(data) {
+      self.showInfoWindow(data);
+    });
+  } else {
     id = setInterval(frame, 5);
   }
 };
 
-GoogleMapsService.prototype.hideInfoWindow = function(event) {
+GoogleMapsService.prototype.hideInfoWindow = function(event, data, callback) {
   var el = document.getElementById('maps-info-window');
   var position = 50;
   var opacity = 1;
@@ -211,7 +251,7 @@ GoogleMapsService.prototype.hideInfoWindow = function(event) {
     if (position === -150) {
       clearInterval(id);
       self.isInfoOpen = false;
-      self.removeInfoWindow();
+      self.removeInfoWindow(data, callback);
     } else {
       position--;
       opacity -= 0.1;
