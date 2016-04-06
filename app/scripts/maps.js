@@ -1,10 +1,12 @@
 'use strict';
 var _ = require('lodash');
 var colors = {
-  50: '34BA46',
   20: 'FE7569',
-  30: 'FFFF57'
+  30: 'FFFF57',
+  50: '34BA46'
 };
+var status = ['Elegibilidad', 'Llamada a Oferentes', 'Contratada'];
+
 var GoogleMapsService = function() {};
 
 function createDocumentElement(element, innerText) {
@@ -17,7 +19,7 @@ function createDocumentElement(element, innerText) {
 GoogleMapsService.prototype.initialize = function(opts) {
   var target = document.getElementById('map');
   var options = {
-    center: {lat: -35.9975272, lng: -60.1723742},
+    center: {lat: -37.3083781, lng: -60.1022673},
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     zoom: 6,
     zoomControl: true,
@@ -26,13 +28,19 @@ GoogleMapsService.prototype.initialize = function(opts) {
     streetViewControl: true,
     rotateControl: true
   };
+  var legend;
+
+  if (opts.legend) {
+    this.createLegend(target);
+    delete opts.legend;
+  }
 
   _.merge(options, opts);
   this.map = new google.maps.Map(target, options);
-  this.map.data.loadGeoJson('/bundle/buenos-aires.json');
+  this.map.data.loadGeoJson('/master/js/buenos-aires.json');
   this.map.data.setStyle({
     fillColor: 'red',
-    fillOpacity: 0.1,
+    fillOpacity: 0.05,
     strokeColor: 'red',
     strokeOpacity: 1,
     strokeWeight: 1,
@@ -110,7 +118,7 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   }
 
   if (data.program) {
-    items.push(createDocumentElement('p', data.program.name));
+    items.push(createDocumentElement('p', data.program));
   }
 
   if (data.amount.official) {
@@ -134,46 +142,44 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   infoWindow.appendChild(right);
 
   infoWindow.id = 'maps-info-window';
-  infoWindow.style.margin = 'auto';
-  infoWindow.style.width = '90%'
   infoWindow.style.backgroundColor = 'white';
+  infoWindow.style.borderRadius = '3px';
+  infoWindow.style.bottom = '-100px';
+  infoWindow.style.boxShadow = 'rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px';
+  infoWindow.style.fontFamily = 'Roboto, Arial, sans-serif';
+  infoWindow.style.left = '5px';
+  infoWindow.style.margin = 'auto';
+  infoWindow.style.opacity = 0;
   infoWindow.style.padding = '10px';
   infoWindow.style.position = 'absolute';
-  infoWindow.style.left = '5px';
-  infoWindow.style.bottom = '-100px';
-  infoWindow.style.opacity = 0;
-  infoWindow.style.borderRadius = '5px';
+  infoWindow.style.textAlign = 'left';
+  infoWindow.style.width = '90%'
 
-  title.style.margin = 0;
   title.style.fontSize = '12px';
+  title.style.margin = 0;
   title.innerText = data.establishment;
 
-  left.style.width = '75%';
-  left.style.float = 'left';
-
-  right.style.width = '20%';
-  right.style.float = 'right';
-
-  close.style.float = 'right';
   close.style.cursor = 'pointer';
-  close.style.padding = '5px 0 0 0';
-  close.style.margin = '-15px 0 0 -25px';
-  close.style.cursor = 'pointer';
+  close.style.position = 'absolute';
+  close.style.right = '10px';
+  close.style.top = 0;
   close.style.width = '5px';
   close.innerText = 'x';
   close.addEventListener('click', _.bind(this.hideInfoWindow, this));
 
+  button.style.backgroundColor = '#009DDC';
+  button.style.border = '1px solid #009DDC';
   button.style.borderRadius = '4px';
-  button.style.padding = '2px  10px';
+  button.style.bottom = '5px';
+  button.style.boxShadow = 'inset 0 -1px 0 #009DDC';
+  button.style.color = '#FFF';
+  button.style.cursor = 'pointer';
   button.style.fontSize = '12px';
   button.style.lineHeight = '1.5rem';
-  button.style.cursor = 'pointer';
-  button.style.border = '1px solid #009DDC';
-  button.style.backgroundColor = '#009DDC';
-  button.style.color = '#FFF';
-  button.style.boxShadow = 'inset 0 -1px 0 #009DDC';
+  button.style.padding = '2px  10px';
+  button.style.position = 'absolute';
+  button.style.right = '10px';
   button.style.textAlign = 'center';
-  button.style.margin = '10px -10px 0 -15px';
   button.innerText = 'Detalles';
   button.addEventListener('click', function(event) {
     if (event) {
@@ -186,6 +192,47 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   wrapper.appendChild(infoWindow);
 
   this.infoWindow = true;
+};
+
+GoogleMapsService.prototype.createLegend = function(target) {
+  var container = document.createElement('div');
+  var items = [document.createElement('div'), document.createElement('div'), document.createElement('div')];
+  var legend;
+  var color;
+  var keys = _.keys(colors);
+
+  container.style.backgroundColor = 'white';
+  container.style.borderRadius = '2px';
+  container.style.boxShadow = 'rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px';
+  container.style.fontFamily = 'Roboto, Arial, sans-serif';
+  container.style.fontSize = '9px';
+  container.style.position = 'absolute';
+  container.style.right = '2px';
+  container.style.top = '9px';
+  container.style.width = '65%';
+
+  for (var i = 0; i < items.length; i++) {
+    legend = document.createElement('p');
+    legend.style.marginBottom = 0;
+    legend.innerText = status[i];
+
+    color = document.createElement('span');
+    color.style.backgroundColor = '#' + colors[keys[i]];
+    color.style.border = '1px solid black';
+    color.style.borderRadius = '3px';
+    color.style.float = 'left';
+    color.style.height = '8px';
+    color.style.margin = '10px 5px 0';
+    color.style.width = '8px';
+
+    items[i].style.width = '33%';
+    items[i].style.float = 'left';
+    items[i].appendChild(color);
+    items[i].appendChild(legend);
+    container.appendChild(items[i]);
+  }
+
+  target.parentElement.appendChild(container);
 };
 
 GoogleMapsService.prototype.removeInfoWindow = function(data, callback) {
@@ -262,7 +309,7 @@ GoogleMapsService.prototype.hideInfoWindow = function(event, data, callback) {
 };
 
 GoogleMapsService.prototype.goToExternalLink = function(data) {
-  window.abrirLicitacion(data.licitation);
+  window.abrirLicitacion(data.licitation.id);
 };
 
 module.exports = new GoogleMapsService();
