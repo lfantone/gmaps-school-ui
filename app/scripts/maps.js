@@ -205,6 +205,7 @@ GoogleMapsService.prototype.createLegend = function(target) {
   container.style.position = 'absolute';
   container.style.right = '2px';
   container.style.padding = '5px 0';
+  container.style.textAlign = 'left';
   container.style.top = '9px';
   container.style.width = '65%';
 
