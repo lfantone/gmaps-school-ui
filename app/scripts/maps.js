@@ -1,11 +1,8 @@
 'use strict';
+
 var _ = require('lodash');
-var colors = {
-  20: 'FE7569',
-  30: 'FFFF57',
-  50: '34BA46'
-};
-var status = ['Elegibilidad', 'Llamada a Oferentes', 'Contratada'];
+var colors = ['#FFFFFF', '#40E0D0', '#9ACD32', '#8D38C9'];
+var status = ['Elegibilidad', 'Llamada', 'Contratada', 'Finalizada'];
 
 var GoogleMapsService = function() {};
 
@@ -37,7 +34,7 @@ GoogleMapsService.prototype.initialize = function(opts) {
 
   _.merge(options, opts);
   this.map = new google.maps.Map(target, options);
-  this.map.data.loadGeoJson('/master/js/buenos-aires.json');
+  this.map.data.loadGeoJson('/web/js/buenos-aires.json');
   this.map.data.setStyle({
     fillColor: 'red',
     fillOpacity: 0.05,
@@ -61,7 +58,7 @@ GoogleMapsService.prototype.addMarker = function(data, timeout) {
       title: data.establishment
     };
 
-    _.merge(options, self.createMarkerIcon(data.status.id));
+    _.merge(options, self.createMarkerIcon(data.status.color));
 
     marker = new google.maps.Marker(options);
     marker.addListener('click', _.bind(self.showInfoWindow, self, data));
@@ -87,7 +84,7 @@ GoogleMapsService.prototype.clearMarkers = function() {
 };
 
 GoogleMapsService.prototype.createMarkerIcon = function(color) {
-  var pinColor = colors[color] || 'FE7569';
+  var pinColor = color || 'FE7569';
   var pinImage = new google.maps.MarkerImage('http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|' + pinColor,
     new google.maps.Size(21, 34),
     new google.maps.Point(0,0),
@@ -196,10 +193,9 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
 
 GoogleMapsService.prototype.createLegend = function(target) {
   var container = document.createElement('div');
-  var items = [document.createElement('div'), document.createElement('div'), document.createElement('div')];
+  var items = [document.createElement('div'), document.createElement('div'), document.createElement('div'), document.createElement('div')];
   var legend;
   var color;
-  var keys = _.keys(colors);
 
   container.style.backgroundColor = 'white';
   container.style.borderRadius = '2px';
@@ -208,21 +204,22 @@ GoogleMapsService.prototype.createLegend = function(target) {
   container.style.fontSize = '9px';
   container.style.position = 'absolute';
   container.style.right = '2px';
+  container.style.padding = '5px 0';
   container.style.top = '9px';
   container.style.width = '65%';
 
   for (var i = 0; i < items.length; i++) {
     legend = document.createElement('p');
-    legend.style.marginBottom = 0;
+    legend.style.margin = 0;
     legend.innerText = status[i];
 
     color = document.createElement('span');
-    color.style.backgroundColor = '#' + colors[keys[i]];
+    color.style.backgroundColor = colors[i];
     color.style.border = '1px solid black';
     color.style.borderRadius = '3px';
     color.style.float = 'left';
     color.style.height = '8px';
-    color.style.margin = '10px 5px 0';
+    color.style.margin = '0 5px 0';
     color.style.width = '8px';
 
     items[i].style.width = '33%';
