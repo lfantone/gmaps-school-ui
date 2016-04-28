@@ -11,8 +11,8 @@
     "open": "http://localhost:9001/",
     "port": 9001,
     "proxies": [
-      {"source": "/api", "target": "http://qa.g-obra.com/"},
-      {"source": "/web/js/", "target": "http://qa.g-obra.com/web/js"}
+      {"source": "/api", "target": "http://www.g-obra.com/"},
+      {"source": "/web/js/", "target": "http://www.g-obra.com/web/js"}
     ]
   }
 }

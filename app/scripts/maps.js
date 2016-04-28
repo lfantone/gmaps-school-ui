@@ -44,26 +44,37 @@ GoogleMapsService.prototype.initialize = function(opts) {
     zIndex: 1
   });
   this.markers = [];
+  this.oms = new OverlappingMarkerSpiderfier(this.map);
   return this;
 };
 
 GoogleMapsService.prototype.addMarker = function(data, timeout) {
-  var marker;
   var self = this;
 
   window.setTimeout(function() {
-    var options = {
-      map: self.map,
-      position: data.geo,
-      title: data.establishment
-    };
+    var marker;
+    for (var i = 0; i < data.licitations.length; i++) {
+      var options = {
+        map: self.map,
+        position: data.geo,
+        title: data.establishment
+      };
 
-    _.merge(options, self.createMarkerIcon(data.status.color));
+      _.merge(options, self.createMarkerIcon(data.licitations[i].status.color));
 
-    marker = new google.maps.Marker(options);
-    marker.addListener('click', _.bind(self.showInfoWindow, self, data));
+      marker = new google.maps.Marker(options);
+      _.merge(marker, {data: data.licitations[i], title: data.establishment});
 
-    self.markers.push(marker);
+      self.oms.addListener('click', function(mark, event) {
+        if (mark.data.id === marker.data.id) {
+          var openFn = _.bind(self.showInfoWindow, self);
+          openFn(mark.data, mark.title);
+        }
+      });
+
+      self.oms.addMarker(marker);
+      self.markers.push(marker);
+    }
   }, timeout);
 
   return self;
@@ -97,7 +108,7 @@ GoogleMapsService.prototype.createMarkerIcon = function(color) {
   return {icon: pinImage, shadow: pinShadow};
 };
 
-GoogleMapsService.prototype.createInfoWindow = function(data) {
+GoogleMapsService.prototype.createInfoWindow = function(data, establishment) {
   var wrapper = document.querySelector('.map-container');
   var infoWindow = document.createElement('div');
   var left = document.createElement('div');
@@ -108,10 +119,14 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
   var items = [];
   var self = this;
 
+  establishment = establishment || _.find(this.markers, function(marker) {
+    return marker.data.id === data.id;
+  }).title;
+
   left.appendChild(title);
 
-  if (data.licitation) {
-    items.push(createDocumentElement('p', data.licitation.code));
+  if (data.code) {
+    items.push(createDocumentElement('p', data.code));
   }
 
   if (data.program) {
@@ -154,7 +169,7 @@ GoogleMapsService.prototype.createInfoWindow = function(data) {
 
   title.style.fontSize = '12px';
   title.style.margin = 0;
-  title.innerText = data.establishment;
+  title.innerText = establishment;
 
   close.style.cursor = 'pointer';
   close.style.position = 'absolute';
@@ -244,7 +259,7 @@ GoogleMapsService.prototype.removeInfoWindow = function(data, callback) {
   }
 };
 
-GoogleMapsService.prototype.showInfoWindow = function(data) {
+GoogleMapsService.prototype.showInfoWindow = function(data, title) {
   var el = document.getElementById('maps-info-window');
   var position = 0;
   var opacity = 0;
@@ -267,7 +282,7 @@ GoogleMapsService.prototype.showInfoWindow = function(data) {
   }
 
   if (!this.infoWindow) {
-   this.createInfoWindow(data);
+   this.createInfoWindow(data, title);
    el = document.getElementById('maps-info-window');
   }
 
@@ -307,7 +322,7 @@ GoogleMapsService.prototype.hideInfoWindow = function(event, data, callback) {
 };
 
 GoogleMapsService.prototype.goToExternalLink = function(data) {
-  window.abrirLicitacion(data.licitation.id);
+  window.abrirLicitacion(data.id);
 };
 
 module.exports = new GoogleMapsService();
